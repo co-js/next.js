@@ -101,6 +101,7 @@ type BaseConfigContext = {|
 |}
 
 export default async function getBaseWebpackConfig (dir: string, {dev = false, isServer = false, buildId, config}: BaseConfigContext) {
+  //webpack默认加载器，next-babel-loader 和 hot-self-accept-loader
   const defaultLoaders = {
     babel: {
       loader: 'next-babel-loader',
@@ -119,11 +120,13 @@ export default async function getBaseWebpackConfig (dir: string, {dev = false, i
     }
   }
 
-  // Support for NODE_PATH
+  // spliting NODE_PATH 环境变量
+  // Support for NODE_PATH 
   const nodePathList = (process.env.NODE_PATH || '')
     .split(process.platform === 'win32' ? ';' : ':')
     .filter((p) => !!p)
-
+ 
+  //   
   const outputPath = path.join(dir, config.distDir, isServer ? SERVER_DIRECTORY : '')
   const pagesEntries = await getPages(dir, {nextPagesDir: DEFAULT_PAGES_DIR, dev, buildId, isServer, pageExtensions: config.pageExtensions.join('|')})
   const totalPages = Object.keys(pagesEntries).length

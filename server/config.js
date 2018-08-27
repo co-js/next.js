@@ -1,7 +1,7 @@
 // @flow
 import findUp from 'find-up'
 import uuid from 'uuid'
-import {CONFIG_FILE} from '../lib/constants'
+import {CONFIG_FILE} from '../lib/constants'   //'next.config.js'配置文件名
 
 type WebpackConfig = *
 
@@ -21,16 +21,16 @@ export type NextConfig = {|
 |}
 
 const defaultConfig: NextConfig = {
-  webpack: null,
-  webpackDevMiddleware: null,
+  webpack: null,                    //webpack 配置
+  webpackDevMiddleware: null,       //webpack dev middleware 中间件配置
   poweredByHeader: true,
-  distDir: '.next',
+  distDir: '.next',   //编译目的目录
   assetPrefix: '',
-  configOrigin: 'default',
-  useFileSystemPublicRoutes: true,
-  generateBuildId: () => uuid.v4(),
-  generateEtags: true,
-  pageExtensions: ['jsx', 'js']
+  configOrigin: 'default',           //标示配置源，比如配置从'next.config.js',则标示为'next.config.js'
+  useFileSystemPublicRoutes: true,   //是否使用文件系统路由
+  generateBuildId: () => uuid.v4(),  //生成本次编译的Id
+  generateEtags: true,                //是否生成Etag for html页面
+  pageExtensions: ['jsx', 'js']       //支持的页面拓展名
 }
 
 type PhaseFunction = (phase: string, options: {defaultConfig: NextConfig}) => NextConfig
@@ -40,7 +40,7 @@ export default function loadConfig (phase: string, dir: string, customConfig?: N
     customConfig.configOrigin = 'server'
     return {...defaultConfig, ...customConfig}
   }
-  const path: string = findUp.sync(CONFIG_FILE, {
+  const path: string = findUp.sync(CONFIG_FILE, {  //从dir目录，并像父级目录查找'next.config.js'
     cwd: dir
   })
 
