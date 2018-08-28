@@ -55,8 +55,8 @@ export default class HotReloader {
     this.buildId = buildId
     this.dir = dir
     this.middlewares = []
-    this.webpackDevMiddleware = null
-    this.webpackHotMiddleware = null
+    this.webpackDevMiddleware = null  //webpackDevMiddleware中间件
+    this.webpackHotMiddleware = null  //webpackhotMiddleware中间件
     this.initialized = false
     this.stats = null
     this.compilationErrors = null
@@ -131,8 +131,9 @@ export default class HotReloader {
   }
 
   async start () {
+    //情况distDir(默认.next)目录
     await this.clean()
-
+    
     const configs = await Promise.all([
       getBaseWebpackConfig(this.dir, { dev: true, isServer: false, config: this.config, buildId: this.buildId }),
       getBaseWebpackConfig(this.dir, { dev: true, isServer: true, config: this.config, buildId: this.buildId })
@@ -219,12 +220,14 @@ export default class HotReloader {
         return
       }
 
+      //当_document.js改变，通知client重新加载页面
       // Notify reload to reload the page, as _document.js was changed (different hash)
       this.send('reload', '/_document')
 
       this.serverPrevDocumentHash = documentChunk.hash
     })
 
+    //编译完成后查看页面块的变化
     multiCompiler.compilers[0].hooks.done.tap('NextjsHotReloaderForClient', (stats) => {
       const { compilation } = stats
       const chunkNames = new Set(
@@ -290,6 +293,7 @@ export default class HotReloader {
       this.prevChunkHashes = chunkHashes
     })
 
+    //webpack忽略监听的文件变化
     const ignored = [
       /(^|[/\\])\../, // .dotfiles
       /node_modules/

@@ -40,7 +40,8 @@ export default class Server {
       console.error(`> Could not find a valid build in the '${this.distDir}' directory! Try building your app with 'next build' before starting the server.`)
       process.exit(1)
     }
-    this.buildId = this.readBuildId(dev)
+    this.buildId = this.readBuildId(dev)  //当dev=development时， buildId=development
+    //hotReloader ?
     this.hotReloader = dev ? this.getHotReloader(this.dir, { config: this.nextConfig, buildId: this.buildId }) : null
     this.renderOpts = {
       dev,
@@ -94,7 +95,8 @@ export default class Server {
   getRequestHandler () {
     return this.handleRequest.bind(this)
   }
-
+  
+  //设置资源前缀
   setAssetPrefix (prefix) {
     this.renderOpts.assetPrefix = prefix ? prefix.replace(/\/$/, '') : ''
     asset.setAssetPrefix(this.renderOpts.assetPrefix)

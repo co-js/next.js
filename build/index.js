@@ -28,9 +28,10 @@ export default async function build(dir, conf = null) {
       getBaseWebpackConfig(dir, { buildId, isServer: false, config }),
       getBaseWebpackConfig(dir, { buildId, isServer: true, config })
     ]);
-
+    
     await runCompiler(configs);
-
+    
+    //把buildId写入BUILD_ID_FILE文件
     await writeBuildId(distDir, buildId);
   } catch (err) {
     console.error(`> Failed to build`);
