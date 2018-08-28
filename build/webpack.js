@@ -66,7 +66,7 @@ function optimizationConfig ({dir, dev, isServer, totalPages}) {
 
   const config: any = {
     runtimeChunk: {
-      name: CLIENT_STATIC_FILES_RUNTIME_WEBPACK
+      name: CLIENT_STATIC_FILES_RUNTIME_WEBPACK   // static/runtime/webpack.js
     },
     splitChunks: {
       cacheGroups: {
@@ -133,8 +133,8 @@ export default async function getBaseWebpackConfig (dir: string, {dev = false, i
   const clientEntries = !isServer ? {
     // Backwards compatibility
     'main.js': [],
-    [CLIENT_STATIC_FILES_RUNTIME_MAIN]: [
-      path.join(NEXT_PROJECT_ROOT_DIST, 'client', (dev ? `next-dev` : 'next'))
+    [CLIENT_STATIC_FILES_RUNTIME_MAIN]: [ // static/runtime/main.js
+      path.join(NEXT_PROJECT_ROOT_DIST, 'client', (dev ? `next-dev` : 'next')) //client目录下next-dev or next
     ].filter(Boolean)
   } : {}
 
@@ -147,11 +147,12 @@ export default async function getBaseWebpackConfig (dir: string, {dev = false, i
     externals: externalsConfig(dir, isServer),
     optimization: optimizationConfig({dir, dev, isServer, totalPages}),
     recordsPath: path.join(outputPath, 'records.json'),
-    context: dir,
+    context: dir,  //用于解析entry,loaders 路径
     // Kept as function to be backwards compatible
     entry: async () => {
       return {
         ...clientEntries,
+        //在开发中，只有_error和_document，其他按需处理
         // Only _error and _document when in development. The rest is handled by on-demand-entries
         ...pagesEntries
       }
@@ -160,6 +161,7 @@ export default async function getBaseWebpackConfig (dir: string, {dev = false, i
       path: outputPath,
       filename: ({chunk}) => {
         // Use `[name]-[contenthash].js` in production
+        // static/runtime/main.js 和 static/runtime/webpack.js
         if (!dev && (chunk.name === CLIENT_STATIC_FILES_RUNTIME_MAIN || chunk.name === CLIENT_STATIC_FILES_RUNTIME_WEBPACK)) {
           return chunk.name.replace(/\.js$/, '-[contenthash].js')
         }
