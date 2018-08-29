@@ -53,7 +53,7 @@ export default class Server {
       distDir: this.distDir,
       hotReloader: this.hotReloader,
       buildId: this.buildId,
-      availableChunks: dev ? {} : getAvailableChunks(this.distDir, dev),
+      availableChunks: dev ? {} : getAvailableChunks(this.distDir, dev),   //可访问的distDir/chunks
       generateEtags
     }
 
@@ -145,8 +145,10 @@ export default class Server {
 
   async defineRoutes () {
     const routes = {
+      // 支持在产品阶段，webpack动态imports
       // This is to support, webpack dynamic imports in production.
       '/_next/webpack/chunks/:name': async (req, res, params) => {
+        // 当在产品阶段时，缓存动态import的文件
         // Cache aggressively in production
         if (!this.dev) {
           res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
@@ -154,13 +156,15 @@ export default class Server {
         const p = join(this.distDir, 'chunks', params.name)
         await this.serveStatic(req, res, p)
       },
-
+      
+      // 支持webpack HMR 动态imports
       // This is to support, webpack dynamic import support with HMR
       '/_next/webpack/:id': async (req, res, params) => {
         const p = join(this.distDir, 'chunks', params.id)
         await this.serveStatic(req, res, p)
       },
 
+      // 支持页面map文件请求
       '/_next/:buildId/page/:path*.js.map': async (req, res, params) => {
         const paths = params.path || ['']
         const page = `/${paths.join('/')}`
@@ -177,6 +181,7 @@ export default class Server {
         await serveStatic(req, res, path)
       },
 
+      // 支持页面js请求
       '/_next/:buildId/page/:path*.js': async (req, res, params) => {
         const paths = params.path || ['']
         const page = `/${paths.join('/')}`
@@ -211,7 +216,8 @@ export default class Server {
 
         await this.serveStatic(req, res, p)
       },
-
+      
+      // commons块文件请求
       '/_next/static/:path*': async (req, res, params) => {
         // The commons folder holds commonschunk files
         // In development they don't have a hash, and shouldn't be cached by the browser.
@@ -226,6 +232,7 @@ export default class Server {
         await this.serveStatic(req, res, p)
       },
 
+      // 支持请求next client目录下的资源
       // It's very important keep this route's param optional.
       // (but it should support as many as params, seperated by '/')
       // Othewise this will lead to a pretty simple DOS attack.
@@ -235,6 +242,7 @@ export default class Server {
         await this.serveStatic(req, res, p)
       },
 
+      // 支持在项目中新建static文件夹，请接收对该文件夹静态资源的请求
       // It's very important keep this route's param optional.
       // (but it should support as many as params, seperated by '/')
       // Othewise this will lead to a pretty simple DOS attack.

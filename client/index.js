@@ -44,6 +44,7 @@ envConfig.setConfig({
   publicRuntimeConfig: runtimeConfig
 })
 
+//根据window.location获取当前访问路径
 const asPath = getURL()
 
 const pageLoader = new PageLoader(buildId, assetPrefix)

@@ -52,6 +52,7 @@ async function doRender (req, res, pathname, query, {
 
   await applySourcemaps(err)
 
+  // 在开发模式下，在rendering之前，我们需要按需编译页面
   if (hotReloader) { // In dev mode we use on demand entries to compile the page before rendering
     await ensurePage(page, { dir, hotReloader })
   }
@@ -78,6 +79,7 @@ async function doRender (req, res, pathname, query, {
   const router = new Router(pathname, query, asPath)
   const props = await loadGetInitialProps(App, {Component, router, ctx})
 
+  // 当在调用getinitialprops时，response可能已经完成
   // the response might be finshed on the getinitialprops call
   if (isResSent(res)) return
 
@@ -209,6 +211,7 @@ function serializeError (dev, err) {
   return { message: '500 - Internal Server Error.' }
 }
 
+// 从文件直接发送静态资源
 export function serveStatic (req, res, path) {
   return new Promise((resolve, reject) => {
     send(req, path)
@@ -224,12 +227,14 @@ export function serveStatic (req, res, path) {
   })
 }
 
+// 确保页面文件已在编译目录下
 async function ensurePage (page, { dir, hotReloader }) {
   if (page === '/_error') return
 
   await hotReloader.ensurePage(page)
 }
 
+// 当dev模式下，加载chunks文件夹下的块
 function loadChunks ({ dev, distDir, availableChunks }) {
   const flushedChunks = flushChunks()
   const response = {

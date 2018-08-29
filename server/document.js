@@ -59,7 +59,8 @@ export class Head extends Component {
       />
     })
   }
-
+  
+  // 预加载main.js 和manifect.js
   getPreloadMainLinks () {
     const { dev } = this.context._documentProps
     if (dev) {
@@ -75,6 +76,7 @@ export class Head extends Component {
     ]
   }
 
+  // 预加载动态Chunks
   getPreloadDynamicChunks () {
     const { chunks, __NEXT_DATA__ } = this.context._documentProps
     let { assetPrefix } = __NEXT_DATA__
@@ -96,6 +98,7 @@ export class Head extends Component {
 
     return <head {...this.props}>
       {(head || []).map((h, i) => React.cloneElement(h, { key: h.key || i }))}
+      {/* 预加载页面 */}
       {page !== '/_error' && <link rel='preload' href={`${assetPrefix}/_next/${buildId}/page${pagePathname}`} as='script' nonce={this.props.nonce} />}
       <link rel='preload' href={`${assetPrefix}/_next/${buildId}/page/_app.js`} as='script' nonce={this.props.nonce} />
       <link rel='preload' href={`${assetPrefix}/_next/${buildId}/page/_error.js`} as='script' nonce={this.props.nonce} />
@@ -148,6 +151,7 @@ export class NextScript extends Component {
     ))
   }
 
+  // 添加main.js和manifest.js脚本
   getScripts () {
     const { dev } = this.context._documentProps
     if (dev) {
@@ -161,7 +165,8 @@ export class NextScript extends Component {
     // So, we can load the script with async
     return [...this.getChunkScript('main.js', { async: true })]
   }
-
+  
+  // 添加动态chunks脚本
   getDynamicChunks () {
     const { chunks, __NEXT_DATA__ } = this.context._documentProps
     let { assetPrefix } = __NEXT_DATA__

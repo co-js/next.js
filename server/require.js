@@ -18,6 +18,7 @@ export function normalizePagePath (page) {
     page = `/${page}`
   }
 
+  // 路径中存在../等相对路径，throw错误
   // Throw when using ../ etc in the pathname
   const resolvedPage = posix.normalize(page)
   if (page !== resolvedPage) {
